@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ar-MA" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>تأكيد الطلب</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="confirm-page">
+      <section class="container">
+        <div class="card confirm-card">
+          <div class="check">✓</div>
+          <h1>الطلب ديالك تسجّل بنجاح</h1>
+          <p class="muted">غادي نتاصلوا بيك فالقريب باش نأكدوا معاك التفاصيل.</p>
+
+          <div class="summary">
+            <p><strong>المنتج:</strong> مروحة صغيرة قابلة للشحن</p>
+            <p><strong>الثمن:</strong> 235 درهم</p>
+            <p><strong>الاسم:</strong> <span id="name">-</span></p>
+            <p><strong>رقم الهاتف:</strong> <span id="phone">-</span></p>
+            <p><strong>العنوان:</strong> <span id="address">-</span></p>
+          </div>
+
+          <div class="actions">
+            <a class="btn btn-primary" href="index.html">رجوع للصفحة الرئيسية</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      (function () {
+        var params = new URLSearchParams(window.location.search);
+        var fromQuery = {
+          name: (params.get("name") || "").trim(),
+          phone: (params.get("phone") || "").trim(),
+          address: (params.get("address") || "").trim()
+        };
+
+        var fromStorage = {};
+        try {
+          fromStorage = JSON.parse(localStorage.getItem("fansLatestOrder") || "{}");
+        } catch (e) {
+          fromStorage = {};
+        }
+
+        var name = fromQuery.name || (fromStorage.fullName || "").trim();
+        var phone = fromQuery.phone || (fromStorage.phone || "").trim();
+        var address = fromQuery.address || (fromStorage.address || "").trim();
+
+        document.getElementById("name").textContent = name || "-";
+        document.getElementById("phone").textContent = phone || "-";
+        document.getElementById("address").textContent = address || "-";
+      })();
+    </script>
+  </body>
+</html>

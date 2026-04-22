@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ar-MA" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>تأكيد الطلب - مروحة صغيرة محمولة</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <strong class="brand">lachmed products</strong>
+        <a class="btn btn-primary" href="#order-form">طلب دابا</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container hero-grid">
+          <div>
+            <span class="badge">عرض محدود</span>
+            <h1>مروحة صغيرة قابلة للشحن بزاوية دوران 90°</h1>
+            <p class="lead">
+              مروحة خفيفة وهادئة تقدر تستعملها فالدار، المكتب ولا فالسفر. كتخدم
+              بـ USB وبـ 3 سرعات.
+            </p>
+            <p class="price-line">
+              الثمن:
+              <strong>235 درهم</strong>
+              <span>خلاص عند الاستلام</span>
+            </p>
+            <a class="btn btn-primary" href="#order-form">أكد الطلب ديالك</a>
+          </div>
+
+          <div class="video-box">
+            <video
+              controls
+              playsinline
+              preload="metadata"
+              src="https://gv.videocdn.alibaba.com/4f4e1c368ac918af/b0aa1312e05dfeb8/20240618_877c3a6bde10ba08_468130677646_mp4_264_hd_unlimit_taobao.mp4?bizCode=icbu_vod_video"
+            ></video>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <h2>صور المنتج</h2>
+          <div class="gallery">
+            <img
+              src="media/653792620_18090833627126407_445585292897821279_n.jpg"
+              alt="صورة المروحة 1"
+              loading="lazy"
+            />
+            <img
+              src="media/651700736_18096677549055734_6538592134223632833_n.jpg"
+              alt="صورة المروحة 2"
+              loading="lazy"
+            />
+            <img src="media/61AqPmQdcGL._AC_SL1500_.jpg" alt="صورة المروحة 3" loading="lazy" />
+            <img src="media/71On-7LIRML._AC_SL1500_.jpg" alt="صورة المروحة 4" loading="lazy" />
+            <img src="media/6112EuYWbOL._AC_SL1500_.jpg" alt="صورة المروحة 5" loading="lazy" />
+            <img src="media/61XPaZ0P4BL._AC_SL1500_.jpg" alt="صورة المروحة 6" loading="lazy" />
+            <img src="media/61v4-B4v1RL._AC_SL1500_.jpg" alt="صورة المروحة 7" loading="lazy" />
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <div class="card">
+            <h2>المميزات الرئيسية</h2>
+            <ul class="features-list">
+              <li>خدامة بصوت منخفض (هادئة بزاف)</li>
+              <li>دوران حتى 90° باش يبرد المكان كامل</li>
+              <li>3 سرعات ساهلين فالتحكم</li>
+              <li>كتخدم بـ USB: لابتوب، باوربانك، شارجور، سيارة</li>
+              <li>خفيفة ومناسبة للسفر والتخييم والمكتب</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="section order-section">
+        <div class="container">
+          <div class="card">
+            <h2>استمارة تأكيد الطلب</h2>
+            <p class="muted">عمّر المعلومات ديالك وغادي نتاصلوا بيك بسرعة.</p>
+            <p id="form-error" class="error" hidden></p>
+
+            <form id="order-form" novalidate>
+              <label for="fullName">الاسم الكامل *</label>
+              <input
+                id="fullName"
+                name="fullName"
+                type="text"
+                autocomplete="name"
+                required
+              />
+
+              <label for="phone">رقم الهاتف *</label>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                inputmode="numeric"
+                pattern="^0[5-7][0-9]{8}$"
+                placeholder="06XXXXXXXX"
+                autocomplete="tel"
+                required
+              />
+
+              <label for="address">العنوان *</label>
+              <textarea
+                id="address"
+                name="address"
+                rows="4"
+                autocomplete="street-address"
+                required
+              ></textarea>
+
+              <button class="btn btn-primary full" type="submit">
+                تأكيد الطلب بـ 235 درهم
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">© lachmed products - جميع الحقوق محفوظة</div>
+    </footer>
+
+    <script>
+      (function () {
+        var form = document.getElementById("order-form");
+        var errorBox = document.getElementById("form-error");
+
+        if (!form || !errorBox) {
+          return;
+        }
+
+        function clean(value) {
+          return (value || "").trim();
+        }
+
+        form.addEventListener("submit", function (event) {
+          event.preventDefault();
+          errorBox.hidden = true;
+          errorBox.textContent = "";
+
+          if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+          }
+
+          var data = {
+            fullName: clean(form.fullName.value),
+            phone: clean(form.phone.value),
+            address: clean(form.address.value),
+            productName: "مروحة صغيرة قابلة للشحن",
+            price: "235 درهم",
+            submittedAt: new Date().toISOString()
+          };
+
+          if (!data.fullName || !data.phone || !data.address) {
+            errorBox.textContent = "المرجو تعمير جميع الخانات المطلوبة.";
+            errorBox.hidden = false;
+            return;
+          }
+
+          var whatsappNumber = "212722429312";
+          var message =
+            "طلب جديد\n" +
+            "المنتج: مروحة صغيرة قابلة للشحن\n" +
+            "الثمن: 235 درهم\n" +
+            "الاسم: " +
+            data.fullName +
+            "\n" +
+            "الهاتف: " +
+            data.phone +
+            "\n" +
+            "العنوان: " +
+            data.address;
+
+          try {
+            localStorage.setItem("fansLatestOrder", JSON.stringify(data));
+          } catch (e) {
+            /* no-op: WhatsApp flow still works without local storage */
+          }
+
+          window.location.href =
+            "https://wa.me/" + whatsappNumber + "?text=" + encodeURIComponent(message);
+        });
+      })();
+    </script>
+  </body>
+</html>
