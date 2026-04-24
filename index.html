@@ -159,7 +159,7 @@
               ></textarea>
 
               <button class="btn btn-primary full" type="submit">
-                تأكيد الطلب 
+                تأكيد الطلب بـ 195 درهم
               </button>
             </form>
           </div>
@@ -171,13 +171,37 @@
       <div class="container">© lachmed products - جميع الحقوق محفوظة</div>
     </footer>
 
+    <div
+      id="form-loading"
+      class="form-loading"
+      hidden
+      role="status"
+      aria-live="polite"
+      aria-busy="false"
+    >
+      <div class="form-loading__panel">
+        <div class="form-loading__spinner" aria-hidden="true"></div>
+        <p class="form-loading__text">كتسجّل الطلب فالسجل… صبر شوية.</p>
+      </div>
+    </div>
+
     <script>
       (function () {
         var form = document.getElementById("order-form");
         var errorBox = document.getElementById("form-error");
+        var loadingOverlay = document.getElementById("form-loading");
 
         if (!form || !errorBox) {
           return;
+        }
+
+        function setLoading(active) {
+          if (!loadingOverlay) {
+            return;
+          }
+          loadingOverlay.hidden = !active;
+          loadingOverlay.setAttribute("aria-busy", active ? "true" : "false");
+          document.body.style.overflow = active ? "hidden" : "";
         }
 
         function clean(value) {
@@ -199,7 +223,7 @@
             phone: clean(form.phone.value),
             address: clean(form.address.value),
             productName: "مروحة صغيرة قابلة للشحن",
-            price: "235 درهم",
+            price: "195 درهم",
             submittedAt: new Date().toISOString()
           };
 
@@ -232,6 +256,8 @@
             /* no-op */
           }
 
+          setLoading(true);
+
           fetch(sheetsEndpoint, {
             method: "POST",
             mode: "no-cors",
@@ -247,6 +273,7 @@
               window.location.href = "confirmation.html?" + params.toString();
             })
             .catch(function () {
+              setLoading(false);
               errorBox.textContent = "وقع مشكل فإرسال الطلب. عاود حاول من فضلك.";
               errorBox.hidden = false;
             })
