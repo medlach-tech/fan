@@ -72,6 +72,10 @@
   [hidden] {
     display: none !important;
   }
+
+  .form-loading.is-active {
+    display: flex !important;
+  }
 </style>
   </head>
   <body>
@@ -245,43 +249,51 @@
     var form = document.getElementById("order-form");
     var errorBox = document.getElementById("form-error");
     var loadingOverlay = document.getElementById("form-loading");
+    var submitButton = form ? form.querySelector('button[type="submit"]') : null;
+    var fullNameInput = document.getElementById("fullName");
+    var phoneInput = document.getElementById("phone");
+    var addressInput = document.getElementById("address");
+
+    if (!form || !errorBox || !loadingOverlay || !fullNameInput || !phoneInput || !addressInput) {
+      return;
+    }
 
     function setLoading(active) {
-      if (!loadingOverlay) return;
-      
       if (active) {
-        loadingOverlay.removeAttribute('hidden');
-        document.body.style.overflow = "hidden"; // Stop scrolling
+        loadingOverlay.hidden = false;
+        loadingOverlay.setAttribute("aria-busy", "true");
+        loadingOverlay.classList.add("is-active");
+        document.body.style.overflow = "hidden";
       } else {
-        loadingOverlay.setAttribute('hidden', '');
+        loadingOverlay.classList.remove("is-active");
+        loadingOverlay.hidden = true;
+        loadingOverlay.setAttribute("aria-busy", "false");
         document.body.style.overflow = "";
       }
     }
 
     form.addEventListener("submit", function (event) {
       event.preventDefault();
-      
+      errorBox.hidden = true;
+      errorBox.textContent = "";
+
       if (!form.checkValidity()) {
         form.reportValidity();
         return;
       }
 
-      // Show the spinner immediately
       setLoading(true);
-
-      var submitButton = form.querySelector('button[type="submit"]');
       if (submitButton) submitButton.disabled = true;
 
       var data = {
-        fullName: form.fullName.value.trim(),
-        phone: form.phone.value.trim(),
-        address: form.address.value.trim(),
+        fullName: fullNameInput.value.trim(),
+        phone: phoneInput.value.trim(),
+        address: addressInput.value.trim(),
         productName: "مروحة صغيرة قابلة للشحن",
         price: "195 درهم"
       };
 
       var sheetsEndpoint = "https://script.google.com/macros/s/AKfycbzZy9DwMbGSxNHTeG0FUKszt3lsxDnWP60se6rNdi6t7o66ZFA1JoPqNWuv5YXc_GQ26g/exec";
-      
       var payload = {
         full_name: data.fullName,
         phone: data.phone,
@@ -294,27 +306,26 @@
 
       fetch(sheetsEndpoint, {
         method: "POST",
-        mode: "no-cors", // Google Apps Script requires this
+        mode: "no-cors",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify(payload)
       })
-      .then(function () {
-        // We wait 1.5 seconds so the user sees the spinner
-        setTimeout(function() {
-          var params = new URLSearchParams({
-            name: data.fullName,
-            phone: data.phone,
-            address: data.address
-          });
-          window.location.href = "confirmation.html?" + params.toString();
-        }, 1500);
-      })
-      .catch(function () {
-        setLoading(false);
-        if (submitButton) submitButton.disabled = false;
-        errorBox.textContent = "وقع مشكل فإرسال الطلب. عاود حاول من فضلك.";
-        errorBox.hidden = false;
-      });
+        .then(function () {
+          setTimeout(function () {
+            var params = new URLSearchParams({
+              name: data.fullName,
+              phone: data.phone,
+              address: data.address
+            });
+            window.location.href = "confirmation.html?" + params.toString();
+          }, 1500);
+        })
+        .catch(function () {
+          setLoading(false);
+          if (submitButton) submitButton.disabled = false;
+          errorBox.textContent = "وقع مشكل فإرسال الطلب. عاود حاول من فضلك.";
+          errorBox.hidden = false;
+        });
     });
   })();
 </script>
