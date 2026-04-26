@@ -20,6 +20,59 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
+ 
+  <style>
+  /* The Overlay */
+  .form-loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+  }
+
+  /* The White Box */
+  .form-loading__panel {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    min-width: 250px;
+  }
+
+  /* The Spinning Circle */
+  .form-loading__spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #2563eb; /* Blue color */
+    border-radius: 50%;
+    margin: 0 auto 15px;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .form-loading__text {
+    font-family: 'Tajawal', sans-serif;
+    font-size: 18px;
+    color: #333;
+    margin: 0;
+  }
+
+  /* Force hidden state */
+  [hidden] {
+    display: none !important;
+  }
+</style>
   </head>
   <body>
     <header class="site-header">
@@ -187,106 +240,83 @@
         <p class="form-loading__text">كتسجّل الطلب فالسجل… صبر شوية.</p>
       </div>
     </div>
+<script>
+  (function () {
+    var form = document.getElementById("order-form");
+    var errorBox = document.getElementById("form-error");
+    var loadingOverlay = document.getElementById("form-loading");
 
-    <script>
-      (function () {
-        var form = document.getElementById("order-form");
-        var errorBox = document.getElementById("form-error");
-        var loadingOverlay = document.getElementById("form-loading");
+    function setLoading(active) {
+      if (!loadingOverlay) return;
+      
+      if (active) {
+        loadingOverlay.removeAttribute('hidden');
+        document.body.style.overflow = "hidden"; // Stop scrolling
+      } else {
+        loadingOverlay.setAttribute('hidden', '');
+        document.body.style.overflow = "";
+      }
+    }
 
-        if (!form || !errorBox) {
-          return;
-        }
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
 
-        function setLoading(active) {
-          if (!loadingOverlay) {
-            return;
-          }
-          loadingOverlay.hidden = !active;
-          loadingOverlay.setAttribute("aria-busy", active ? "true" : "false");
-          document.body.style.overflow = active ? "hidden" : "";
-        }
+      // Show the spinner immediately
+      setLoading(true);
 
-        function clean(value) {
-          return (value || "").trim();
-        }
+      var submitButton = form.querySelector('button[type="submit"]');
+      if (submitButton) submitButton.disabled = true;
 
-        form.addEventListener("submit", function (event) {
-          event.preventDefault();
-          errorBox.hidden = true;
-          errorBox.textContent = "";
+      var data = {
+        fullName: form.fullName.value.trim(),
+        phone: form.phone.value.trim(),
+        address: form.address.value.trim(),
+        productName: "مروحة صغيرة قابلة للشحن",
+        price: "195 درهم"
+      };
 
-          if (!form.checkValidity()) {
-            form.reportValidity();
-            return;
-          }
+      var sheetsEndpoint = "https://script.google.com/macros/s/AKfycbzZy9DwMbGSxNHTeG0FUKszt3lsxDnWP60se6rNdi6t7o66ZFA1JoPqNWuv5YXc_GQ26g/exec";
+      
+      var payload = {
+        full_name: data.fullName,
+        phone: data.phone,
+        address: data.address,
+        product: data.productName,
+        price: data.price,
+        source: "fans-landing",
+        timestamp: new Date().toISOString()
+      };
 
-          var data = {
-            fullName: clean(form.fullName.value),
-            phone: clean(form.phone.value),
-            address: clean(form.address.value),
-            productName: "مروحة صغيرة قابلة للشحن",
-            price: "195 درهم",
-            submittedAt: new Date().toISOString()
-          };
-
-          if (!data.fullName || !data.phone || !data.address) {
-            errorBox.textContent = "المرجو تعمير جميع الخانات المطلوبة.";
-            errorBox.hidden = false;
-            return;
-          }
-
-          var submitButton = form.querySelector('button[type="submit"]');
-          if (submitButton) {
-            submitButton.disabled = true;
-          }
-
-          var sheetsEndpoint =
-            "https://script.google.com/macros/s/AKfycbzZy9DwMbGSxNHTeG0FUKszt3lsxDnWP60se6rNdi6t7o66ZFA1JoPqNWuv5YXc_GQ26g/exec";
-          var payload = {
-            full_name: data.fullName,
+      fetch(sheetsEndpoint, {
+        method: "POST",
+        mode: "no-cors", // Google Apps Script requires this
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      })
+      .then(function () {
+        // We wait 1.5 seconds so the user sees the spinner
+        setTimeout(function() {
+          var params = new URLSearchParams({
+            name: data.fullName,
             phone: data.phone,
-            address: data.address,
-            product: data.productName,
-            price: data.price,
-            source: "fans-landing",
-            timestamp: data.submittedAt
-          };
-
-          try {
-            localStorage.setItem("fansLatestOrder", JSON.stringify(data));
-          } catch (e) {
-            /* no-op */
-          }
-
-          setLoading(true);
-
-          fetch(sheetsEndpoint, {
-            method: "POST",
-            mode: "no-cors",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify(payload)
-          })
-            .then(function () {
-              var params = new URLSearchParams({
-                name: data.fullName,
-                phone: data.phone,
-                address: data.address
-              });
-              window.location.href = "confirmation.html?" + params.toString();
-            })
-            .catch(function () {
-              setLoading(false);
-              errorBox.textContent = "وقع مشكل فإرسال الطلب. عاود حاول من فضلك.";
-              errorBox.hidden = false;
-            })
-            .finally(function () {
-              if (submitButton) {
-                submitButton.disabled = false;
-              }
-            });
-        });
-      })();
-    </script>
+            address: data.address
+          });
+          window.location.href = "confirmation.html?" + params.toString();
+        }, 1500);
+      })
+      .catch(function () {
+        setLoading(false);
+        if (submitButton) submitButton.disabled = false;
+        errorBox.textContent = "وقع مشكل فإرسال الطلب. عاود حاول من فضلك.";
+        errorBox.hidden = false;
+      });
+    });
+  })();
+</script>
   </body>
 </html>
